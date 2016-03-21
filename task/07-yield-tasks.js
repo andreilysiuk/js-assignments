@@ -33,7 +33,14 @@
  *
  */
 function* get99BottlesOfBeer() {
-    throw new Error('Not implemented');
+    let bottle = (n => n == 1 ? `1 bottle` : `${n} bottles`);
+    for (let i = 99; i > 0; i--) {
+        yield `${bottle(i)} of beer on the wall, ${bottle(i)} of beer.`;
+        if (i > 1) yield `Take one down and pass it around, ${bottle(i - 1)} of beer on the wall.`;
+        else yield `Take one down and pass it around, no more bottles of beer on the wall.`;
+    }
+    yield 'No more bottles of beer on the wall, no more bottles of beer.';
+    yield 'Go to the store and buy some more, 99 bottles of beer on the wall.';
 }
 
 
@@ -47,7 +54,13 @@ function* get99BottlesOfBeer() {
  *
  */
 function* getFibonacciSequence() {
-    throw new Error('Not implemented');
+    let a, b, c;
+    yield a = 0; 
+    yield b = 1;
+    while(true) {
+        yield c = a + b;
+        a = b; b = c;
+    }    
 }
 
 
@@ -82,7 +95,14 @@ function* getFibonacciSequence() {
  *
  */
 function* depthTraversalTree(root) {
-    throw new Error('Not implemented');
+    let q1 = [root];
+    while (q1.length) {
+        let node = q1.pop();
+        yield node;
+        if (node.children) {
+            q1.push(...node.children.reverse());
+        }
+    }
 }
 
 
@@ -108,7 +128,13 @@ function* depthTraversalTree(root) {
  *
  */
 function* breadthTraversalTree(root) {
-    throw new Error('Not implemented');
+    let q1 = [root];
+    for (let node of q1) {
+        yield node;
+        if (node.children) {
+            q1.push(...node.children);
+        }
+    }
 }
 
 
@@ -126,7 +152,16 @@ function* breadthTraversalTree(root) {
  *   [ 1, 3, 5, ... ], [ -1 ] => [ -1, 1, 3, 5, ...]
  */
 function* mergeSortedSequences(source1, source2) {
-    throw new Error('Not implemented');
+    let i1 = 0, i2 = 0;
+    while(i1 < source1.length && i2 < source2.length) {
+        yield (source1[i1] < source2[i2] ? source1[i1++] : source2[i2++]);
+    }
+    for(; i1 < source1.length; i1++) {
+        yield source1[i1];
+    }
+    for(; i2 < source2.length; i2++) {
+        yield source2[i2];
+    }    
 }
 
 

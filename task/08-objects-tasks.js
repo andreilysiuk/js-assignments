@@ -23,7 +23,12 @@
  *    console.log(r.getArea());   // => 200
  */
 function Rectangle(width, height) {
-    throw new Error('Not implemented');
+    this.width = width;
+    this.height = height;
+}
+
+Rectangle.prototype.getArea = function () {
+    return this.width * this.height;
 }
 
 
@@ -38,7 +43,7 @@ function Rectangle(width, height) {
  *    { width: 10, height : 20 } => '{"height":10,"width":20}'
  */
 function getJSON(obj) {
-    throw new Error('Not implemented');
+    return JSON.stringify(obj);
 }
 
 
@@ -54,7 +59,7 @@ function getJSON(obj) {
  *
  */
 function fromJSON(proto, json) {
-    throw new Error('Not implemented');
+    return Object.setPrototypeOf(JSON.parse(json), proto);
 }
 
 
@@ -106,35 +111,92 @@ function fromJSON(proto, json) {
  *  For more examples see unit tests.
  */
 
-const cssSelectorBuilder = {
+//Is it right???
+class Selector {    
+    constructor(str) {
+        this.str = str || '';
+    }
+    
+    stringify() {
+        return this.str;
+    }    
+}
 
+class SelectorPE extends Selector {
+    pseudoElement(value) {
+        this.str += `::${value}`;
+        this.__proto__ = Selector.prototype;
+        return this;
+    }
+}
+
+class SelectorPC extends SelectorPE {
+    pseudoClass(value) {
+        this.str += `:${value}`;
+        return this;
+    }
+}
+
+class SelectorAt extends SelectorPC {
+    attr(value) {
+        this.str += `[${value}]`;
+        return this;
+    }
+}
+
+class SelectorCl extends SelectorAt {
+    class(value) {
+        this.str += `.${value}`;
+        return this;
+    }
+}
+
+class SelectorId extends SelectorCl {
+    id(value) {
+        this.str += `#${value}`;
+        this.__proto__ = SelectorCl.prototype;
+        return this;
+    }
+}
+
+class SelectorEl extends SelectorId {
+    element(value) {
+        this.str += value;
+        this.__proto__ = SelectorId.prototype;
+        return this;
+    }
+}
+
+
+const cssSelectorBuilder = {
     element: function(value) {
-        throw new Error('Not implemented');
+        return new SelectorEl().element(value);
     },
 
     id: function(value) {
-        throw new Error('Not implemented');
+        return new SelectorId().id(value);
     },
 
     class: function(value) {
-        throw new Error('Not implemented');
+        return new SelectorCl().class(value);
     },
 
     attr: function(value) {
-        throw new Error('Not implemented');
+        return new SelectorAt().attr(value);
     },
 
     pseudoClass: function(value) {
-        throw new Error('Not implemented');
+        return new SelectorPC().pseudoClass(value);
     },
 
     pseudoElement: function(value) {
-        throw new Error('Not implemented');
+        return new SelectorPE().pseudoElement(value);
     },
 
     combine: function(selector1, combinator, selector2) {
-        throw new Error('Not implemented');
-    },
+        return new Selector([selector1.stringify(), combinator, 
+                             selector2.stringify()].join(' '));
+    }    
 };
 
 
