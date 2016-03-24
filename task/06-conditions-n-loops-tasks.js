@@ -457,7 +457,8 @@ function getMatrixProduct(m1, m2) {
     let n = m1.length,
         m = m2[0].length,
         k = m2.length;
-    let ans = new Array(n).fill(null).map(() => new Array(m).fill(0));
+    let ans = Array.from({'length' : n}, () => 
+              Array.from({'length':m}, () => 0));
     for( let x = 0; x < n; x++)
     for( let y = 0; y < m; y++)
     for( let i = 0; i < k; i++) {
