@@ -97,14 +97,9 @@ function timeSpanToString(startDate, endDate) {
  *    Date.UTC(2016,3,5,21, 0) => Math.PI/2
  */
 function angleBetweenClockHands(date) { //BAD TESTS :((
-    let delta = (date - Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 
-                 date.getUTCDay()));
-    const FULL_DAY = 24 * 60 * 60 * 1000;   
-    let getAngle = (n => n * 360 * delta / FULL_DAY % 360);
-    let hA = getAngle(2), 
-        mA = getAngle(24),
-        dA = Math.abs(hA - mA);
-    return Math.min(dA, 360 - dA) * Math.PI / 180;
+    //Used formula https://en.wikipedia.org/wiki/Clock_angle_problem
+    let angle = Math.abs(30 * (date.getUTCHours() % 12) - 5.5 * date.getUTCMinutes()); //Use formula 
+    return Math.min(angle, 360 - angle) * Math.PI / 180;
 }
 
 
