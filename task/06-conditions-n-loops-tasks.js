@@ -327,7 +327,7 @@ function isBracketsBalanced(str) {
     let open = '[{(<';
     let closed = ']})>';
     for (let c of str) {
-        if (~open.indexOf(c)) {
+        if (open.indexOf(c) != -1) {
             tmp.push(c);
             continue;
         }
