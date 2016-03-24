@@ -128,11 +128,10 @@ function isTriangle(a,b,c) {
  *  
  */
 function doRectanglesOverlap(rect1, rect2) {
-    let l1 = rect1.left, l2 = rect2.left,
-        r1 = l1 + rect1.width, r2 = l2 + rect2.width,
-        t1 = rect1.top, t2 = rect2.top,
-        b1 = t1 + rect1.height, b2 = t2 + rect2.height;
-    return !(r2 <= l1 || r1 <= l2 || b2 <= t1 || b1 <= t2);            
+    return !(rect2.left + rect2.width <= rect1.left) 
+           && !(rect1.left + rect1.width <= rect2.left) 
+           && !(rect2.top + rect2.height <= rect1.top) 
+           && !(rect1.top + rect1.height <= rect2.top);            
 }
 
 
