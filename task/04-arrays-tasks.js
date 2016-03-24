@@ -416,12 +416,10 @@ function toStringList(arr) {
  *      { country: 'Russia',  city: 'Moscow' },
  *      { country: 'Russia',  city: 'Saint Petersburg' }
  */
-function sortCitiesArray(arr) {
-   function comp(a, b) {
-      return a.country < b.country || 
-             (a.country == b.country && a.city < b.city) ? -1 : 1;
-   } 
-   return arr.sort(comp);
+function sortCitiesArray(arr) { //It really works!!!
+   return arr.sort( (a, b) =>
+       JSON.stringify(a).localeCompare(JSON.stringify(b))
+   );
 }
 
 /**
