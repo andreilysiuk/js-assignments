@@ -154,27 +154,9 @@ function retry(func, attempts) {
  *
  */
 function logger(func, logFunc) {
-    // My toString
-    // Maybe rewrite Array.prototype.toString ???
-    function getArgLine(arg) {
-        if (arg == null) {
-            return `${arg}`
-        }
-        else if (arg.map) {
-            let tmp = arg.map(e => getArgLine(e)).join(',');
-            return `[${tmp}]`
-        } 
-        else if (typeof(arg) == 'string') {
-            return `"${arg}"` 
-        }
-        else return `${arg}`;
-    }
-    function getArgsLine(args) {
-        return args.map(e => getArgLine(e)).join(',');
-    }
-    
+   
     return function() {
-        let argsLine = getArgsLine([].slice.call(arguments), '');       
+        var argsLine = JSON.stringify(Array.from(arguments)).slice(1,-1);     
         logFunc(`${func.name}(${argsLine}) starts`);
         let ans = func.apply(this, arguments);
         logFunc(`${func.name}(${argsLine}) ends`);
