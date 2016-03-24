@@ -65,11 +65,12 @@ function getPowerFunction(exponent) {
  *   getPolynom()      => null
  */
 function getPolynom() { //Maybe use Heron's formula ??? 
-    let coef = [].slice.call(arguments);
+    let coef = Array.from(arguments).reverse();
     return function (x) {
         let l = coef.length;
         if (l == 0) return null;
-        return coef.reduce((p, e, i) => p + e*Math.pow(x, l - i - 1), 0);
+        let _x = 1;
+        return coef.reduce((p, e, i) => p + e * (_x *= x));
     }
 }
 
@@ -93,7 +94,7 @@ function memoize(func) {
     let value = null;
     return function () {
         if (!isSaved) {
-            value = func.call(this, arguments);
+            value = func.apply(this, arguments);
             isSaved = true;            
         }
         return value;
@@ -198,7 +199,7 @@ function logger(func, logFunc) {
 function partialUsingArguments(fn) {
     let arg1 = [].slice.call(arguments, 1);
     return function () { // Why doesn't work ...args?
-        let arg2 = [].slice.call(arguments);
+        let arg2 = Array.from(arguments);
         return fn.apply(this, arg1.concat(arg2));
     }
 }
