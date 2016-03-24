@@ -273,8 +273,8 @@ function isString(value) {
  */
 function getCardId(value) {
     let suit = '♣♦♥♠';
-    let number = 'A234567891JQK'; //Hack
-    return suit.indexOf(value[value.length-1]) * 13 + number.indexOf(value[0]);
+    let number = 'A234567891JQK';
+    return suit.indexOf(value.slice(-1)) * 13 + number.indexOf(value[0]);
 }
 
 
