@@ -499,20 +499,17 @@ function getMatrixProduct(m1, m2) {
  *
  */
 function evaluateTicTacToePosition(position) {
-    let isWin = function(s) { //s - Char symbol
-        let v = [0, 0, 0], h = [0, 0, 0];
-        for(let x = 0; x < 3; x++)
-        for(let y = 0; y < 3; y++) {
-            h[x] += position[x][y] === s;
-            v[x] += position[y][x] === s;            
-        }
-        let d1 = 0, d2 = 0;
-        for(let x = 0; x < 3; x++) {
-            d1 += position[x][x] === s;
-            d2 += position[x][2-x] === s;
-        }
-        return v.indexOf(3) != -1 || h.indexOf(3) != -1 || d1 == 3 || d2 == 3;
-    };
+    const coords = [
+        [[0, 0], [0, 1], [0, 2]],
+        [[1, 0], [1, 1], [1, 2]],
+        [[2, 0], [2, 1], [2, 2]],
+        [[0, 0], [1, 0], [2, 0]],
+        [[0, 1], [1, 1], [2, 1]],
+        [[0, 2], [1, 2], [2, 2]],
+        [[0, 0], [1, 1], [2, 2]],
+        [[0, 2], [1, 1], [2, 0]]
+    ];
+    let isWin = (c => coords.some(arr => arr.every(e => position[e[0]][e[1]] == c)));
     return isWin('X') ? 'X' :
            isWin('0') ? '0' :
            undefined;
