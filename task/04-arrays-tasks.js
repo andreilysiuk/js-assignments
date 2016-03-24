@@ -388,7 +388,7 @@ function findAllOccurences(arr, item) {
  *    ['rock', 'paper', 'scissors']     => 'rock,paper,scissors'
  */
 function toStringList(arr) {
-   return arr.join(',');
+   return arr.toString();
 }
 
 
