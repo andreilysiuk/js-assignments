@@ -572,10 +572,12 @@ function getElementByIndexes(arr, indexes) {
  * 
  */
 function swapHeadAndTail(arr) {
-    let l2 = arr.length;
-    let l = Math.floor(l2 / 2);
-    return l2 == 2 * l ? arr.slice(l).concat(arr.slice(0, l))
-               : arr.slice(l + 1).concat(arr[l], arr.slice(0, l));
+    let l = arr.length + (arr.length % 2),
+        l2 = l / 2;
+    return arr.map((e, i) => {
+       let ind = (l2 + i) % l;
+       return (ind < arr.length) ? arr[ind] : arr[l2-1]; 
+    });
 }
 
 
