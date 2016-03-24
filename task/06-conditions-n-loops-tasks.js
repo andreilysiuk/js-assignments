@@ -371,20 +371,21 @@ function isBracketsBalanced(str) {
  *
  */
 function timespanToHumanString(startDate, endDate) {
-    let del = endDate - startDate;
-    const s = 1000, m = 60 * s, h = 60 * m, d = 24 * h, mn = 30 * d, y = 365 * d;
-    let getCount = (t => Math.floor((del + t / 2 - 1) / t));
-    return del <= 45 * s ? `a few seconds ago` :  // 45 * s => 45s
-           del <= 90 * s ? `a minute ago` :
-           del <= 45 * m ? `${getCount(m)} minutes ago` :
-           del <= 90 * m ? `an hour ago` :
-           del <= 22 * h ? `${getCount(h)} hours ago` :
-           del <= 36 * h ? `a day ago` :
-           del <= 25 * d ? `${getCount(d)} days ago` :
-           del <= 45 * d ? `a month ago` :
-           del <= 345 * d ? `${getCount(mn)} months ago` :
-           del <= 545 * d ? `a year ago` :
-           `${getCount(y)} years ago`;           
+    let timespan = endDate - startDate;
+    const sec = 1000, min = 60 * sec, hour = 60 * min, day = 24 * hour, 
+          month = 30 * day, year = 365 * day;
+    let getCount = (t => Math.floor((timespan + t / 2 - 1) / t));
+    return timespan <= 45 * sec ? `a few seconds ago` :  // 45 * ses => 45s
+           timespan <= 90 * sec ? `a minute ago` :
+           timespan <= 45 * min ? `${getCount(min)} minutes ago` :
+           timespan <= 90 * min ? `an hour ago` :
+           timespan <= 22 * hour ? `${getCount(hour)} hours ago` :
+           timespan <= 36 * hour ? `a day ago` :
+           timespan <= 25 * day ? `${getCount(day)} days ago` :
+           timespan <= 45 * day ? `a month ago` :
+           timespan <= 345 * day ? `${getCount(month)} months ago` :
+           timespan <= 545 * day ? `a year ago` :
+           `${getCount(year)} years ago`;           
 }
 
 
