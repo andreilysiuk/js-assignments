@@ -112,9 +112,55 @@ function fromJSON(proto, json) {
  */
 
 //Is it right???
-class Selector {    
-    constructor(str) {
-        this.str = str || '';
+
+const SelectorState = {
+   empty: 0,
+   element: 1,
+   id: 2,
+   class: 3,
+   attr: 4,
+   pseudoClass: 5,
+   pseudoElement: 6,
+   full: 7 
+};
+
+class Selector {
+    constructor() {
+        this.str = '';
+        this.state = SelectorState.empty;
+    }
+    
+    _default(needState, canReuse, mapValue) {
+        if (this.state > needState) {
+            throw new Error("You can't do that");
+        }
+        this.state = needState + !canReuse;
+        this.str += mapValue;
+        return this;      
+    }
+    
+    element(value) { 
+        return this._default(SelectorState.element, false, value);
+    }
+    
+    id(value) {
+        return this._default(SelectorState.id, false, `#${value}`);
+    }
+    
+    class(value) {
+        return this._default(SelectorState.class, true, `.${value}`);
+    }
+    
+    attr(value) {
+        return this._default(SelectorState.attr, true, `[${value}]`);
+    }
+    
+    pseudoClass(value) {
+        return this._default(SelectorState.pseudoClass, true, `:${value}`);
+    }
+    
+    pseudoElement(value) {
+        return this._default(SelectorState.pseudoElement, false, `::${value}`);
     }
     
     stringify() {
@@ -122,80 +168,46 @@ class Selector {
     }    
 }
 
-class SelectorPE extends Selector {
-    pseudoElement(value) {
-        this.str += `::${value}`;
-        this.__proto__ = Selector.prototype;
-        return this;
+class CombinedSelector {
+    constructor(selector1, combinator, selector2) {
+        this.selector1 = selector1;
+        this.combinator = combinator;
+        this.selector2 = selector2;
+    }
+    
+    stringify() {
+        return [this.selector1.stringify(), this.combinator, this.selector2.stringify()].join(' ');
     }
 }
-
-class SelectorPC extends SelectorPE {
-    pseudoClass(value) {
-        this.str += `:${value}`;
-        return this;
-    }
-}
-
-class SelectorAt extends SelectorPC {
-    attr(value) {
-        this.str += `[${value}]`;
-        return this;
-    }
-}
-
-class SelectorCl extends SelectorAt {
-    class(value) {
-        this.str += `.${value}`;
-        return this;
-    }
-}
-
-class SelectorId extends SelectorCl {
-    id(value) {
-        this.str += `#${value}`;
-        this.__proto__ = SelectorCl.prototype;
-        return this;
-    }
-}
-
-class SelectorEl extends SelectorId {
-    element(value) {
-        this.str += value;
-        this.__proto__ = SelectorId.prototype;
-        return this;
-    }
-}
-
 
 const cssSelectorBuilder = {
+
     element: function(value) {
-        return new SelectorEl().element(value);
+        return new Selector().element(value);
     },
 
     id: function(value) {
-        return new SelectorId().id(value);
+        return new Selector().id(value);    
     },
 
     class: function(value) {
-        return new SelectorCl().class(value);
+        return new Selector().class(value);
     },
 
     attr: function(value) {
-        return new SelectorAt().attr(value);
+        return new Selector().attr(value);
     },
 
     pseudoClass: function(value) {
-        return new SelectorPC().pseudoClass(value);
+        return new Selector().pseudoClass(value);
     },
 
     pseudoElement: function(value) {
-        return new SelectorPE().pseudoElement(value);
+        return new Selector().pseudoElement(value);
     },
 
     combine: function(selector1, combinator, selector2) {
-        return new Selector([selector1.stringify(), combinator, 
-                             selector2.stringify()].join(' '));
+        return new CombinedSelector(selector1, combinator, selector2);
     }    
 };
 
