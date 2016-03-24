@@ -38,7 +38,7 @@ function findElement(arr, value) {
  *    5 => [ 1, 3, 5, 7, 9 ]
  */
 function generateOdds(len) {
-    return new Array(len).fill(null).map((e, i) => 2 * i + 1);
+    return Array.from({'length' : len}, (e, i) => 2 * i + 1);
 }
 
 
@@ -447,11 +447,8 @@ function sortCitiesArray(arr) {
  *           [0,0,0,0,1]]   
  */
 function getIdentityMatrix(n) {
-   return new Array(n).fill(null).map((e, i) => {
-       let tmp = new Array(n).fill(0);
-       tmp[i] = 1;
-       return tmp;
-   });
+   return Array.from({'length' : n}, (e1, i1) => 
+          Array.from({'length' : n}, (e2, i2) => +(i1 == i2)));
 }
 
 /**
@@ -469,7 +466,7 @@ function getIdentityMatrix(n) {
  */
 function getIntervalArray(start, end) {
    let len = end - start + 1;
-   return new Array(len).fill(start).map((e, i) => e + i);
+   return Array.from({'length' : len}, (e, i) => start + i);
 }
 
 /**
