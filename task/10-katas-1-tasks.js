@@ -17,8 +17,30 @@
  *  ]
  */
 function createCompassPoints() {
-    throw new Error('Not implemented');
-    var sides = ['N','E','S','W'];  // use array of cardinal directions only!
+    function transform(arr, func) {
+        let trn = arr.map(func);
+        let ans = [];
+        arr.forEach((e, i) => ans.push(e, trn[i]));
+        return ans;     
+    }
+    let sides = ['N','E','S','W'];  // use array of cardinal directions only!
+    // get N, NE, E, ....
+    sides = transform(sides, (e, i, arr) => {
+        if (i % 2 == 0) return arr[i] + arr[i + 1];
+        else return arr[(i + 1) % 4] + arr[i]; 
+    });
+    // get N, NNE, NE, ....
+    sides = transform(sides, (e, i, arr) => {
+        if (i % 2 == 0) return arr[i] + arr[i + 1];
+        else return arr[(i + 1) % 8] + arr[i]; 
+    }); 
+    // get N, NbE, NNE, ...
+    sides = transform(sides, (e, i, arr) => {
+        if (i % 2 == 0) return arr[i] + 'b' + arr[(i + 4 - i % 4) % 16];
+        else return arr[(i + 1) % 16] + 'b' + arr[i - i % 4];
+    });
+    const dAngle = 360 / sides.length;
+    return sides.map((e, i) => ({'abbreviation' : e, 'azimuth' : i * dAngle}));
 }
 
 
@@ -55,8 +77,68 @@ function createCompassPoints() {
  *
  *   'nothing to do' => 'nothing to do'
  */
+// very fast algorithm: O(n) operations and O(n) memory per yield
+// not O(2^n)  for {0,1}{0,1}{0,1}{0,1}{0,1}{0,1}....
+// Idea: from original string creates the digraph.
+// Each path in it from the initial vertex to final is an answer to the problem
+class Node {
+    constructor(str) {
+        this.str = str || '';
+        this.children = [];
+    }
+}
+
+function createDigraph(head, str) {
+    let cur = head;
+    let headStack = [], tailStack = [];
+    for(let c of str) {
+        if (c == '{') {
+            let _head = new Node();
+            let _tail = new Node();
+            headStack.push(_head);
+            tailStack.push(_tail);
+            cur.children.push(_head);
+            cur = _head;
+        }
+        else if (c == '}') {
+            let _root = headStack.pop();
+            let _tail = tailStack.pop();
+            cur.children.push(_tail);
+            cur = _tail;    
+        }
+        else if (c == ',' && headStack.length) {
+            let _root = headStack.slice(-1)[0];
+            let _tail = tailStack.slice(-1)[0];
+            cur.children.push(_tail);
+            cur = _root;            
+        } 
+        else {
+            let node = new Node(c);
+            cur.children.push(node);
+            cur = node;
+        }
+    }
+}
+
 function* expandBraces(str) {
-    throw new Error('Not implemented');
+    let head = new Node();
+    createDigraph(head, str);
+    //non-recursive dfs
+    let q = [head], ans = [];
+    while (q.length) {
+        let node = q.slice(-1)[0];
+        if (node.used) {
+            node.used = false;
+            q.pop(); ans.pop();
+        } else {
+            node.used = true;
+            q.push(...node.children);
+            ans.push(node.str);
+            if (!node.children.length) { //tail
+                yield ans.join(''); 
+            }
+        }
+    }
 }
 
 
@@ -88,7 +170,15 @@ function* expandBraces(str) {
  *
  */
 function getZigZagMatrix(n) {
-    throw new Error('Not implemented');
+    let ans = Array.from({'length': n}, () => new Array(n));
+    let v = 0;
+    for (let k = 0; k < 2*n - 1; k++) 
+    for (let l = 0; l < n; l++) {
+        let y = (k % 2 == 0 ? l : n - 1 - l),
+            x = k - y;
+        if (x >= 0 && x < n) ans[x][y] = v++;
+    }
+    return ans;
 }
 
 
@@ -112,8 +202,39 @@ function getZigZagMatrix(n) {
  * [[0,0], [0,1], [1,1], [0,2], [1,2], [2,2], [0,3], [1,3], [2,3], [3,3]] => false
  *
  */
+// Idea: http://e-maxx.ru/algo/euler_path
 function canDominoesMakeRow(dominoes) {
-    throw new Error('Not implemented');
+    // Create adjacency matrix
+    let adjMatrix = Array.from({length: 7}, () => new Array(7).fill(0));
+    for (let e of dominoes) {
+        adjMatrix[e[0]][e[1]]++;
+        adjMatrix[e[1]][e[0]]++;
+    }
+    // Create degrees vector and check adjMatrix
+    let degrees = adjMatrix.map(e => e.reduce((p, e) => p + e));
+    let odds = degrees.reduce((p, e, i) => {
+        if (e % 2) p.push(i);
+        return p;
+    }, []);
+    if (odds.length > 2) return false;
+    // Get the start vertex
+    let start = (odds.length ? odds[0] : degrees.findIndex(e => e > 0));
+    // Run the algorithm
+    let stack = [start];
+    while (stack.length) {
+        let from = stack.slice(-1)[0];
+        if (degrees[from] == 0) {
+            stack.pop();
+        } else {
+            let to = adjMatrix[from].findIndex(e => e);
+            adjMatrix[from][to]--;
+            adjMatrix[to][from]--;
+            degrees[from]--;
+            degrees[to]--;
+            stack.push(to);
+        }
+    }
+    return (degrees.reduce((p, e) => p + e) == 0);    
 }
 
 
@@ -136,8 +257,17 @@ function canDominoesMakeRow(dominoes) {
  * [ 0, 1, 2, 5, 7, 8, 9] => '0-2,5,7-9'
  * [ 1, 2, 4, 5]          => '1,2,4,5'
  */
-function extractRanges(nums) {
-    throw new Error('Not implemented');
+function extractRanges(nums) { // Wrong @return
+    return nums.reduce((p, e, i) => {
+        if (p.end == e - 1) p.end = e;
+        if (p.end != e || i == nums.length - 1) {
+            p.str += (p.begin == p.end) ? `,${p.begin}` :
+                     (p.begin == p.end - 1) ? `,${p.begin},${p.end}` :
+                     `,${p.begin}-${p.end}`;
+            p.begin = p.end = e;
+        }
+        return p;
+    }, {str : '', begin : NaN, end : NaN}).str.slice(9); // Cut ',NaN-NaN,' trick
 }
 
 module.exports = {
